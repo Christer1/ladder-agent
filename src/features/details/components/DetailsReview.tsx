@@ -22,12 +22,29 @@ import { FoundBanner } from './FoundBanner';
 
 const SECTION_HEADING_CLASSES = 'text-[19px] leading-7 font-semibold text-text-heading';
 
+/** Drops fields the record has no value for. */
+const presentFields = (fields: Array<[label: string, value: string | null]>) =>
+  fields.filter((field): field is [string, string] => Boolean(field[1]));
+
 function DetailsForm({ details }: { details: AssistanceDetails }) {
   const router = useRouter();
   const markConfirmed = useAssistanceStore((state) => state.markConfirmed);
   const confirmDetails = useConfirmDetails();
   const [formError, setFormError] = useState<string | null>(null);
   const needsAddress = details.residentialAddress === null;
+  const personalFields = presentFields([
+    ['Full name', details.fullName],
+    ['Date of birth', formatDisplayDate(details.dateOfBirth)],
+    ['Gender', details.gender],
+    ['Phone number', details.phoneNumber],
+    ['Email address', details.email],
+  ]);
+  const additionalFields = presentFields([
+    ['State of origin', details.stateOfOrigin],
+    ['State of residence', details.stateOfResidence],
+    ['Town', details.town],
+    ['Residential address', details.residentialAddress],
+  ]);
 
   const {
     register,
@@ -57,10 +74,9 @@ function DetailsForm({ details }: { details: AssistanceDetails }) {
           Personal Information
         </h2>
         <dl className="mt-4 flex flex-col gap-4">
-          <DetailField label="Full name" value={details.fullName} />
-          <DetailField label="Date of birth" value={formatDisplayDate(details.dateOfBirth)} />
-          <DetailField label="Phone number" value={details.phoneNumber} />
-          {details.email && <DetailField label="Email address" value={details.email} />}
+          {personalFields.map(([label, value]) => (
+            <DetailField key={label} label={label} value={value} tone="muted" />
+          ))}
         </dl>
       </section>
 
@@ -68,11 +84,14 @@ function DetailsForm({ details }: { details: AssistanceDetails }) {
         <h2 id="additional-heading" className={SECTION_HEADING_CLASSES}>
           Additional Information
         </h2>
-        {details.residentialAddress ? (
-          <dl className="mt-4">
-            <DetailField label="Residential address" value={details.residentialAddress} />
+        {additionalFields.length > 0 && (
+          <dl className="mt-4 flex flex-col gap-4">
+            {additionalFields.map(([label, value]) => (
+              <DetailField key={label} label={label} value={value} />
+            ))}
           </dl>
-        ) : (
+        )}
+        {needsAddress && (
           <div className="mt-4">
             <Input
               label="Residential address"

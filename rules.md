@@ -7,7 +7,7 @@ Read before writing code in `ladder-assistance`. When this file is silent, follo
 A responsive web app a partner (first: **Zenith**) uses to open customer accounts. The customer identifies with **BVN or NIN**, **BVN and NIN**, or their **Ladder ID** (looked up in the same `ladder-backend` database as Ladder Web), passes a **liveness check**, and reviews the details we retrieved.
 
 - The designs in `../ladder-assisntance-screens` are the **mobile** breakpoint. Tablet/desktop follow §5.
-- Backend: `../ladder-backend`. The endpoints below don't exist yet, so build against MSW mocks (§9).
+- Backend: `../ladder-backend` (`modules/assistance`). BVN/NIN are checked against its seeded `identity_records`; Ladder IDs against its `users`. MSW mocks (§9) mirror it for UI work.
 
 ## 2. Screens and flow
 
@@ -27,14 +27,14 @@ A responsive web app a partner (first: **Zenith**) uses to open customer account
 ```
 
 - **`/`**: partner logo, "Open a new account with {partner}", two option cards (BVN or NIN, BVN and NIN), "OR", then "Create account using Ladder ID". Skyline and tagline at the bottom.
-- **`/bvn-or-nin`**: BVN | NIN toggle (BVN default), 11-digit number, date of birth. Continue is disabled until the form is valid. On a mismatch, show "Information mismatch." under date of birth and a pinned **Get Help** (WhatsApp) button.
-- **`/bvn-and-nin`**: same layout with BVN and NIN fields and no toggle.
-- **`/ladder-id`**: ID illustration, Ladder ID field, Verify. Success → `/liveness`.
+- **`/bvn-or-nin`**: BVN | NIN toggle (BVN default), 11-digit number, date of birth. Continue is disabled until the form is valid. On `INFORMATION_MISMATCH`, mark both fields red and show "Information mismatch. Check your BVN and date of birth." under date of birth with an inline **Get help** (WhatsApp) link beside it, not pinned to the bottom. Any edit clears it.
+- **`/bvn-and-nin`**: same layout with BVN and NIN fields and no toggle; a mismatch marks all three fields.
+- **`/ladder-id`**: ID illustration, Ladder ID field, Verify. Success → `/liveness`. `LADDER_ID_NOT_FOUND` shows under the field with Get help beside it.
 - **`/liveness`**: same behaviour as Ladder Web (`LivenessCamera` + `useCamera`), with the red CTA. Success → `/verifying`.
 - **`/verifying`**: spinner while `GET /assistance/details` loads, then `replace('/details')`. Error → Try again + Get Help.
-- **`/details`**: "We found your details" banner, Personal Information (full name, date of birth, phone, email), Additional Information (residential address). CTA **Continue** → confirm → `/complete`.
+- **`/details`**: "We found your details" banner, Personal Information on grey cards (full name, date of birth, gender, phone, email), Additional Information on white cards (state of origin, state of residence, town, residential address). Fields the record lacks are hidden; a missing address becomes an input. CTA **Continue** → confirm → `/complete`. Same screen for every method; for a Ladder ID, the email is the Ladder account's.
 
-**Design fixes:** the Ladder ID placeholder is `e.g. LID-7F3A-9K2D` (the backend format), the fourth details card is "Email address", and the details CTA is "Continue", not "Verify Face".
+**Design fixes:** the Ladder ID placeholder is "Enter your Ladder ID" (no fixed format), the two "State" cards are state of origin and state of residence, the last card's duplicate "Phone number" is dropped, and the details CTA is "Continue", not "Verify Face".
 
 **Open questions:** the BVN and NIN design · what reference face liveness compares against for BVN/NIN · which "additional information" fields, and whether they are retrieved or typed · what happens after confirm · how the partner is authenticated.
 
@@ -83,33 +83,34 @@ Call chain: `page → component → hook → <feature>.api.ts → lib/api/client
 |---|---|---|---|
 | POST | `/assistance/identify/bvn` | `{ bvn, dateOfBirth }` | `{ status }` + session cookie |
 | POST | `/assistance/identify/nin` | `{ nin, dateOfBirth }` | same |
-| POST | `/assistance/identify/bvn-and-nin` | `{ bvn, nin, dateOfBirth }` | same |
+| POST | `/assistance/identify/bvn-and-nin` | `{ bvn, nin, dateOfBirth }` | same (both must be the same person) |
 | POST | `/assistance/identify/ladder-id` | `{ ladderId }` | same |
 | POST | `/assistance/liveness` | multipart `selfie` | `{ status }` |
 | GET | `/assistance/status` | — | `{ method, identity, liveness }` |
-| GET | `/assistance/details` | — | `{ fullName, dateOfBirth, phoneNumber, email, residentialAddress }` |
+| GET | `/assistance/details` | — | `{ fullName, dateOfBirth, gender, phoneNumber, email, stateOfOrigin, stateOfResidence, town, residentialAddress }` (all but name and date of birth may be null) |
 | POST | `/assistance/confirm` | `{ residentialAddress? }` | `{}` |
 | POST | `/assistance/session/end` | — | clears cookie |
 
 - Same envelope as the backend: `{ success, message, data }` / `{ success: false, message, code, errors? }`.
-- Error codes: `INFORMATION_MISMATCH`, `BVN_NOT_FOUND`, `NIN_NOT_FOUND`, `BVN_NIN_MISMATCH`, `LADDER_ID_NOT_FOUND`, `FACE_MISMATCH`, `LIVENESS_FAILED`, `LIVENESS_REQUIRED` (403), `ASSISTANCE_SESSION_EXPIRED` (401 → `/`), `RATE_LIMITED`.
+- Error codes: `INFORMATION_MISMATCH` (any wrong/unknown number or date of birth, or a BVN and NIN of different people: the backend never says which), `LADDER_ID_NOT_FOUND`, `LIVENESS_REQUIRED` (403), `ASSISTANCE_SESSION_EXPIRED` (401 → `/`), `PARTNER_NOT_ALLOWED` (403), `RATE_LIMITED`, `VALIDATION_FAILED`. `FACE_MISMATCH` exists only in mocks until a liveness provider is added.
 - Session: a short-lived httpOnly cookie set on identify. Every request sends `X-Partner-Id`. `RouteGuard` uses `/assistance/status` to keep users on their next step.
 
 ## 8. Forms and state
 
 - Zod schema + React Hook Form. Submit buttons are disabled until the form is valid.
-- BVN/NIN: 11 digits. Date of birth: native date input, 18+, sent as `YYYY-MM-DD`. Ladder ID: `LID-XXXX-XXXX`, upper-cased.
+- BVN/NIN: 11 digits. Date of birth: "DD / MM / YYYY" text with a calendar button, 18+, sent as `YYYY-MM-DD`. Ladder ID: deliberately loose so a format change doesn't break the screen: 6–32 letters, digits or dashes, sent as typed (trimmed); the backend matches case-insensitively.
 - Server data lives in TanStack Query. Flow state (the "confirmed" flag) lives in Zustand, not persisted. The chosen method comes from `/assistance/status`. Form input stays in the form.
 
 ## 9. Mocks
+
+With `NEXT_PUBLIC_USE_MOCKS=false`, the real backend answers: use the numbers and dates of birth printed by `npm run db:seed` in `ladder-backend` (its last table lists BVN + NIN pairs of the same person), and any Ladder ID of a user verified with a BVN or NIN. The backend's `WEB_ORIGIN` must include this app's origin.
 
 `NEXT_PUBLIC_USE_MOCKS=true`. Test values:
 
 | Input | Result |
 |---|---|
-| BVN/NIN `00000000000` | not found |
-| BVN/NIN `11111111111` | `INFORMATION_MISMATCH` |
-| NIN `22222222222` (BVN and NIN) | `BVN_NIN_MISMATCH` |
+| BVN/NIN `00000000000` or `11111111111` | `INFORMATION_MISMATCH` |
+| NIN `22222222222` (BVN and NIN) | `INFORMATION_MISMATCH` |
 | `44444444444` / `LID-4444-4444` | liveness fails (`FACE_MISMATCH`) |
 | `LID-2222-2222` | `LADDER_ID_NOT_FOUND` |
 | `LID-5555-5555` | no address returned |

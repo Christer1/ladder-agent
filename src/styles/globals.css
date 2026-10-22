@@ -24,6 +24,7 @@
   /* Surfaces */
   --color-surface: #ffffff;
   --color-surface-subtle: #f2f4f7; /* segmented control track, icon circles */
+  --color-surface-muted: #f9fafb; /* read-only Personal Information cards */
   --color-surface-success: #ecf7ee; /* "We found your details" banner */
   --color-face-placeholder: #d9d9d9; /* liveness oval before the camera starts */
 
