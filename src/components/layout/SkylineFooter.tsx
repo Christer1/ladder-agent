@@ -1,5 +1,5 @@
 // City skyline + partner tagline ("— Banking for a brighter future —").
-// inline: centred illustration with the tagline under it (desktop BrandPanel).
+// inline: centred illustration with the tagline under it.
 // backdrop: edge-to-edge, taller and faded, with the tagline over it (bottom of the welcome screen).
 import { PARTNER } from '@/config/partner';
 import { cn } from '@/lib/utils/cn';
