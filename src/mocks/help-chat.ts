@@ -15,6 +15,7 @@ export async function openHelpChat(reference: string | null): Promise<HelpChatCo
     id: `mock-${nextId++}`,
     sender,
     text,
+    agentName: null,
   });
 
   const state: HelpChatSnapshot = {
@@ -31,6 +32,7 @@ export async function openHelpChat(reference: string | null): Promise<HelpChatCo
       ),
     ],
     isTyping: false,
+    agentName: null,
   };
   const listeners = new Set<(snapshot: HelpChatSnapshot) => void>();
   const emit = () => listeners.forEach((listener) => listener({ ...state }));

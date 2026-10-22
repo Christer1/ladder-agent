@@ -11,18 +11,23 @@ export type StartHelpChatResponse = {
   firebaseToken: string;
 };
 
-export type HelpChatSender = 'customer' | 'ladder';
+/** ladder: the AI or a fixed Ladder message. agent: a person from Ladder's support team. */
+export type HelpChatSender = 'customer' | 'ladder' | 'agent';
 
 export type HelpChatMessage = {
   id: string;
   sender: HelpChatSender;
   text: string;
+  /** Set on agent messages. */
+  agentName: string | null;
 };
 
 export type HelpChatSnapshot = {
   messages: HelpChatMessage[];
   /** Ladder's AI is writing a reply. */
   isTyping: boolean;
+  /** The support agent who has taken the chat over from the AI, if any. */
+  agentName: string | null;
 };
 
 /** One open chat. Firestore-backed, or in memory when mocks are on. */

@@ -23,11 +23,13 @@ export async function openHelpChat(reference: string | null): Promise<HelpChatCo
     chatId,
 
     watch(onChange, onError) {
-      const snapshot: HelpChatSnapshot = { messages: [], isTyping: false };
+      const snapshot: HelpChatSnapshot = { messages: [], isTyping: false, agentName: null };
       const stopChat = onSnapshot(
         chatRef,
         (chat) => {
           snapshot.isTyping = chat.get('aiTyping') === true;
+          snapshot.agentName =
+            chat.get('mode') === 'agent' ? String(chat.get('agentName') ?? 'Ladder Support') : null;
           onChange({ ...snapshot });
         },
         onError,
@@ -39,6 +41,7 @@ export async function openHelpChat(reference: string | null): Promise<HelpChatCo
             id: message.id,
             sender: message.get('sender') as HelpChatSender,
             text: String(message.get('text') ?? ''),
+            agentName: (message.get('agentName') as string | undefined) ?? null,
           }));
           onChange({ ...snapshot });
         },

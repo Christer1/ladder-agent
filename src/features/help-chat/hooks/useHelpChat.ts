@@ -46,6 +46,7 @@ export function useHelpChat(reference: string | null) {
   const [connection, setConnection] = useState<HelpChatConnection | null>(null);
   const [messages, setMessages] = useState<HelpChatMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [agentName, setAgentName] = useState<string | null>(null);
   const [pending, setPending] = useState<PendingMessage[]>([]);
   const [attempt, setAttempt] = useState(0);
   const messagesRef = useRef(messages);
@@ -66,6 +67,7 @@ export function useHelpChat(reference: string | null) {
           (snapshot) => {
             setMessages(snapshot.messages);
             setIsTyping(snapshot.isTyping);
+            setAgentName(snapshot.agentName);
             setStatus('ready');
           },
           () => {
@@ -135,8 +137,10 @@ export function useHelpChat(reference: string | null) {
     error,
     messages,
     pending: unsent,
-    // Show "typing" from the moment a message is sent, before the backend flags it.
-    isTyping: isTyping || unsent.some((p) => !p.failed),
+    agentName,
+    // Show "typing" from the moment a message is sent, before the backend flags it. An agent
+    // answers in their own time, so there is no typing indicator while one has the chat.
+    isTyping: !agentName && (isTyping || unsent.some((p) => !p.failed)),
     send,
     resend,
     retry,

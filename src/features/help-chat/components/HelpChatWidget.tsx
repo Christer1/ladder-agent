@@ -34,7 +34,7 @@ export function HelpChatWidget() {
 
 function HelpChatPanel({ reference }: { reference: string | null }) {
   const close = useHelpChatStore((state) => state.close);
-  const { status, error, messages, pending, isTyping, send, resend, retry } =
+  const { status, error, messages, pending, isTyping, agentName, send, resend, retry } =
     useHelpChat(reference);
   const logRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -72,7 +72,9 @@ function HelpChatPanel({ reference }: { reference: string | null }) {
           <h2 id="help-chat-title" className="text-base font-semibold">
             Ladder Support
           </h2>
-          <p className="text-sm text-ladder-100">We reply in seconds</p>
+          <p className="text-sm text-ladder-100">
+            {agentName ? `You’re chatting with ${agentName}` : 'We reply in seconds'}
+          </p>
         </div>
         <button
           type="button"
@@ -113,7 +115,12 @@ function HelpChatPanel({ reference }: { reference: string | null }) {
             className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-5"
           >
             {messages.map((message) => (
-              <ChatBubble key={message.id} sender={message.sender} text={message.text} />
+              <ChatBubble
+                key={message.id}
+                sender={message.sender}
+                text={message.text}
+                agentName={message.agentName}
+              />
             ))}
             {pending.map((message) => (
               <ChatBubble
