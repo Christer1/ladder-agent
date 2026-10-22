@@ -1,5 +1,7 @@
 # Ladder Assistance — Rules
 
+> **AI usage:** We used Claude AI (by Anthropic) as a development assistant on this project. The rules below are the guidelines the team wrote and followed while building it, with Claude's help.
+
 Read before writing code in `ladder-assistance`. When this file is silent, follow `../ladder-web/rules.md`. Fix this file in the same change if it's wrong.
 
 ## 1. What we are building
