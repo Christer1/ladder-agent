@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { GetHelpButton } from '@/components/layout/GetHelpButton';
 import { Button, Input, SegmentedControl } from '@/components/ui';
 import { ROUTES } from '@/config/routes';
 import type { ApiError } from '@/lib/api/errors';
@@ -15,7 +16,7 @@ import {
   bvnOrNinSchema,
   type BvnOrNinFormValues,
 } from '../schemas/identity.schema';
-import { resolveIdentityError } from '../utils/identity-error';
+import { mismatchMessage, resolveIdentityError } from '../utils/identity-error';
 import { DateOfBirthField } from './DateOfBirthField';
 import { IdentityScreen } from './IdentityScreen';
 
@@ -32,7 +33,8 @@ export function BvnOrNinForm() {
   const router = useRouter();
   const identifyBvn = useIdentifyBvn();
   const identifyNin = useIdentifyNin();
-  const [isHelpVisible, setIsHelpVisible] = useState(false);
+  // The number and date of birth didn't match a record. Both fields are marked: we can't say which.
+  const [isMismatch, setIsMismatch] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const isPending = identifyBvn.isPending || identifyNin.isPending;
 
@@ -57,6 +59,7 @@ export function BvnOrNinForm() {
     setValue('idType', next);
     setValue('idNumber', '');
     clearErrors();
+    setIsMismatch(false);
     setFormError(null);
   };
 
@@ -64,13 +67,15 @@ export function BvnOrNinForm() {
   const clearServerErrors = () => {
     if (errors.dateOfBirth?.type === 'server') clearErrors('dateOfBirth');
     if (errors.idNumber?.type === 'server') clearErrors('idNumber');
+    setIsMismatch(false);
     setFormError(null);
   };
 
   const handleError = (error: ApiError) => {
     const resolved = resolveIdentityError(error);
-    if (resolved.showsHelp) setIsHelpVisible(true);
-    if (resolved.field === 'dateOfBirth') {
+    if (resolved.isMismatch) {
+      setIsMismatch(true);
+    } else if (resolved.field === 'dateOfBirth') {
       setError('dateOfBirth', { type: 'server', message: resolved.message });
     } else if (resolved.field === 'bvn' || resolved.field === 'nin') {
       setError('idNumber', { type: 'server', message: resolved.message });
@@ -93,7 +98,7 @@ export function BvnOrNinForm() {
   };
 
   return (
-    <IdentityScreen title="BVN or NIN" isHelpVisible={isHelpVisible}>
+    <IdentityScreen title="BVN or NIN">
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <SegmentedControl
           label="Identifier"
@@ -116,6 +121,7 @@ export function BvnOrNinForm() {
                 maxLength={ID_NUMBER_LENGTH}
                 readOnly={isPending}
                 error={errors.idNumber?.message}
+                isInvalid={isMismatch}
                 {...field}
                 onChange={(event) => {
                   clearServerErrors();
@@ -137,13 +143,22 @@ export function BvnOrNinForm() {
                 }}
                 onBlur={field.onBlur}
                 disabled={isPending}
-                error={errors.dateOfBirth?.message}
+                error={
+                  errors.dateOfBirth?.message ??
+                  (isMismatch ? mismatchMessage(`${idLabel} and date of birth`) : undefined)
+                }
+                errorAction={
+                  isMismatch && !errors.dateOfBirth ? <GetHelpButton variant="inline" /> : undefined
+                }
               />
             )}
           />
         </div>
 
         <div aria-live="polite">
+          {isMismatch && (
+            <p className="sr-only">{mismatchMessage(`${idLabel} and date of birth`)}</p>
+          )}
           {formError && (
             <p role="alert" className="mt-6 text-sm text-danger">
               {formError}

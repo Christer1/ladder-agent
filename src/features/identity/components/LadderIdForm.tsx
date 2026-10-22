@@ -6,10 +6,15 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { BackButton } from '@/components/layout/BackButton';
+import { GetHelpButton } from '@/components/layout/GetHelpButton';
 import { Button, Input } from '@/components/ui';
 import { ROUTES } from '@/config/routes';
 import { useIdentifyLadderId } from '../hooks/useIdentify';
-import { ladderIdSchema, type LadderIdFormValues } from '../schemas/identity.schema';
+import {
+  LADDER_ID_MAX_LENGTH,
+  ladderIdSchema,
+  type LadderIdFormValues,
+} from '../schemas/identity.schema';
 import { resolveIdentityError } from '../utils/identity-error';
 import { IdCardIllustration } from './IdCardIllustration';
 
@@ -17,11 +22,13 @@ export function LadderIdForm() {
   const router = useRouter();
   const identify = useIdentifyLadderId();
   const [formError, setFormError] = useState<string | null>(null);
+  const [isHelpVisible, setIsHelpVisible] = useState(false);
 
   const {
     register,
     handleSubmit,
     setError,
+    clearErrors,
     formState: { errors, isValid },
   } = useForm<LadderIdFormValues>({
     resolver: zodResolver(ladderIdSchema),
@@ -37,6 +44,7 @@ export function LadderIdForm() {
         onSuccess: () => router.push(ROUTES.LIVENESS),
         onError: (error) => {
           const resolved = resolveIdentityError(error);
+          setIsHelpVisible(resolved.showsHelp);
           if (resolved.field === 'ladderId') {
             setError('ladderId', { type: 'server', message: resolved.message });
           } else {
@@ -67,15 +75,26 @@ export function LadderIdForm() {
         <Input
           label="Ladder ID"
           labelClassName="text-[15px] font-medium text-text-heading"
-          placeholder="e.g. LID-7F3A-9K2D"
+          placeholder="Enter your Ladder ID"
           autoComplete="off"
           autoCapitalize="characters"
           spellCheck={false}
-          maxLength={13}
+          maxLength={LADDER_ID_MAX_LENGTH}
           readOnly={identify.isPending}
           error={errors.ladderId?.message}
-          className="uppercase placeholder:normal-case"
-          {...register('ladderId')}
+          errorAction={
+            isHelpVisible && errors.ladderId?.type === 'server' ? (
+              <GetHelpButton variant="inline" />
+            ) : undefined
+          }
+          {...register('ladderId', {
+            // A server answer is about the ID as typed, so any edit clears it.
+            onChange: () => {
+              if (errors.ladderId?.type === 'server') clearErrors('ladderId');
+              setIsHelpVisible(false);
+              setFormError(null);
+            },
+          })}
         />
 
         <div aria-live="polite">

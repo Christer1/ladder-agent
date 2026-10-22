@@ -45,7 +45,7 @@ export const detailsHandlers = [
       const message = 'Enter your residential address';
       return fail(400, {
         message,
-        code: 'VALIDATION_ERROR',
+        code: 'VALIDATION_FAILED',
         errors: { residentialAddress: [message] },
       });
     }

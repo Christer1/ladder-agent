@@ -10,6 +10,8 @@ type InputProps = React.ComponentProps<'input'> & {
   rightElement?: React.ReactNode;
   /** Error text under the field. Pass `isInvalid` instead to only colour the border. */
   error?: string;
+  /** Shown beside the error text, e.g. a Get Help link. */
+  errorAction?: React.ReactNode;
   isInvalid?: boolean;
   labelClassName?: string;
 };
@@ -18,6 +20,7 @@ export function Input({
   label,
   rightElement,
   error,
+  errorAction,
   isInvalid,
   id,
   className,
@@ -53,9 +56,12 @@ export function Input({
         )}
       </div>
       {error && (
-        <p id={errorId} className="-mt-1.5 text-xs text-danger">
-          {error}
-        </p>
+        <div className="-mt-1.5 flex items-start justify-between gap-3">
+          <p id={errorId} className="text-xs leading-5 text-danger">
+            {error}
+          </p>
+          {errorAction && <div className="shrink-0">{errorAction}</div>}
+        </div>
       )}
     </div>
   );

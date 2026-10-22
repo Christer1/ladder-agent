@@ -1,10 +1,13 @@
-// "Get Help" pill that opens the partner's WhatsApp support (config/partner.ts). No personal data in the link.
+// "Get Help" link to the partner's WhatsApp support (config/partner.ts). No personal data in the link.
+//   button  full-width pill (e.g. under Try again)
+//   inline  compact link placed beside the error it helps with
 import { PARTNER } from '@/config/partner';
 import { buttonClasses } from '@/components/ui';
+import { cn } from '@/lib/utils/cn';
 
-function WhatsAppIcon() {
+function WhatsAppIcon({ size = 24 }: { size?: number }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="12" cy="12" r="11" className="fill-white" />
       <path
         d="M12 4.2a7.8 7.8 0 0 0-6.7 11.8L4.2 19.8l3.9-1a7.8 7.8 0 1 0 3.9-14.6Z"
@@ -18,16 +21,30 @@ function WhatsAppIcon() {
   );
 }
 
-export function GetHelpButton({ className }: { className?: string }) {
+type GetHelpButtonProps = {
+  variant?: 'button' | 'inline';
+  className?: string;
+};
+
+export function GetHelpButton({ variant = 'button', className }: GetHelpButtonProps) {
+  const isInline = variant === 'inline';
+
   return (
     <a
       href={PARTNER.supportWhatsAppUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={buttonClasses('primary', className)}
+      className={
+        isInline
+          ? cn(
+              'inline-flex min-h-6 items-center gap-1 rounded-pill text-xs font-semibold text-primary-600 underline-offset-2 hover:underline',
+              className,
+            )
+          : buttonClasses('primary', className)
+      }
     >
-      Get Help
-      <WhatsAppIcon />
+      {isInline ? 'Get help' : 'Get Help'}
+      <WhatsAppIcon size={isInline ? 16 : 24} />
       <span className="sr-only">(opens WhatsApp in a new tab)</span>
     </a>
   );

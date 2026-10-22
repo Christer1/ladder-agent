@@ -6,8 +6,12 @@ import { displayToIsoDate, parseIsoDate } from '@/lib/utils/date';
 export const MIN_AGE = 18;
 export const ID_NUMBER_LENGTH = 11;
 
-/** Same alphabet as ladder-backend/src/common/utils/ladder-id.ts (no 0/O/1/I/L). */
-export const LADDER_ID_PATTERN = /^LID-[2-9A-HJKMNP-Z]{4}-[2-9A-HJKMNP-Z]{4}$/;
+/**
+ * Ladder ID: deliberately loose so a change of ID format doesn't break this screen. The backend
+ * decides whether the ID exists; it compares case-insensitively.
+ */
+export const LADDER_ID_MIN_LENGTH = 6;
+export const LADDER_ID_MAX_LENGTH = 32;
 
 function ageOn(dateOfBirth: Date, today: Date): number {
   let age = today.getFullYear() - dateOfBirth.getFullYear();
@@ -64,8 +68,9 @@ export const ladderIdSchema = z.object({
   ladderId: z
     .string()
     .trim()
-    .toUpperCase()
-    .regex(LADDER_ID_PATTERN, 'Enter your Ladder ID, e.g. LID-7F3A-9K2D'),
+    .min(LADDER_ID_MIN_LENGTH, `Enter at least ${LADDER_ID_MIN_LENGTH} characters`)
+    .max(LADDER_ID_MAX_LENGTH, `Use ${LADDER_ID_MAX_LENGTH} characters or fewer`)
+    .regex(/^[A-Za-z0-9-]+$/, 'Use letters, numbers and dashes only'),
 });
 
 export type LadderIdFormValues = z.infer<typeof ladderIdSchema>;

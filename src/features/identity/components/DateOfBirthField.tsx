@@ -12,6 +12,7 @@ type DateOfBirthFieldProps = {
   onChange: (value: string) => void;
   onBlur: () => void;
   error?: string;
+  errorAction?: React.ReactNode;
   disabled?: boolean;
 };
 
@@ -35,6 +36,7 @@ export function DateOfBirthField({
   onChange,
   onBlur,
   error,
+  errorAction,
   disabled,
 }: DateOfBirthFieldProps) {
   const pickerRef = useRef<HTMLInputElement>(null);
@@ -63,6 +65,7 @@ export function DateOfBirthField({
       value={value}
       disabled={disabled}
       error={error}
+      errorAction={errorAction}
       onChange={(event) => onChange(maskDateInput(event.target.value))}
       onBlur={onBlur}
       rightElement={
