@@ -30,10 +30,10 @@ export function CompleteSummary() {
           />
         </svg>
         <h1 className="mt-8 text-[22px] leading-8 font-semibold text-text-strong">
-          Your details have been sent to {PARTNER.name}
+          Your account has been created
         </h1>
         <p className="mt-3 max-w-[320px] text-base text-text-body">
-          {PARTNER.name} will contact you to finish opening your account.
+          Your {PARTNER.name} account is ready to use.
         </p>
       </div>
 
