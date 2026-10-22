@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="300" height="80" viewBox="0 0 300 80" fill="none" stroke="#d0d5dd" stroke-width="1.2" stroke-linejoin="round">
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="80" viewBox="0 0 300 80" preserveAspectRatio="none" fill="none" stroke="#d0d5dd" stroke-width="1.5" stroke-linejoin="round">
+  <style>path{vector-effect:non-scaling-stroke}</style>
   <path d="M2 79h296"/>
   <path d="M6 79v-8l5-4 5 4v8"/>
   <path d="M20 79V52h10v27"/>
