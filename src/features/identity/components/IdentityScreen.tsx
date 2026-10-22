@@ -1,5 +1,5 @@
 // Shared frame for the BVN or NIN and BVN and NIN screens: back, title, subtitle, form.
-// Get Help sits beside the mismatch error inside the form, not pinned to the bottom.
+// Get Help sits under the mismatch error inside the form, not pinned to the bottom.
 import { BackButton } from '@/components/layout/BackButton';
 import { ROUTES } from '@/config/routes';
 

@@ -147,9 +147,7 @@ export function BvnOrNinForm() {
                   errors.dateOfBirth?.message ??
                   (isMismatch ? mismatchMessage(`${idLabel} and date of birth`) : undefined)
                 }
-                errorAction={
-                  isMismatch && !errors.dateOfBirth ? <GetHelpButton variant="inline" /> : undefined
-                }
+                errorAction={isMismatch && !errors.dateOfBirth ? <GetHelpButton /> : undefined}
               />
             )}
           />

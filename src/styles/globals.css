@@ -36,6 +36,9 @@
   --color-danger: #d92d20; /* "Information mismatch.", error borders (4.6:1) */
   --color-success: #2e7d32;
   --color-whatsapp: #25d366;
+  --color-whatsapp-200: #b7ecc9; /* Get Help card border */
+  --color-whatsapp-100: #dcf6e5; /* Get Help card hover */
+  --color-whatsapp-50: #effbf3; /* Get Help card */
 
   /* Lines */
   --color-border: #e4e7ec;

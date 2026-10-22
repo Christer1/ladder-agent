@@ -66,7 +66,7 @@ export function VerifyingDetails() {
       {isFailed && (
         <div className="mt-auto flex flex-col gap-3 pt-10 md:mt-10">
           <Button onClick={() => void refetch()}>Try again</Button>
-          <GetHelpButton className="bg-transparent text-primary-600 hover:bg-primary-50" />
+          <GetHelpButton />
         </div>
       )}
     </div>

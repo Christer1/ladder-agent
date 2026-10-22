@@ -83,9 +83,7 @@ export function LadderIdForm() {
           readOnly={identify.isPending}
           error={errors.ladderId?.message}
           errorAction={
-            isHelpVisible && errors.ladderId?.type === 'server' ? (
-              <GetHelpButton variant="inline" />
-            ) : undefined
+            isHelpVisible && errors.ladderId?.type === 'server' ? <GetHelpButton /> : undefined
           }
           {...register('ladderId', {
             // A server answer is about the ID as typed, so any edit clears it.

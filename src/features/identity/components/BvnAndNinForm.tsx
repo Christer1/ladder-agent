@@ -119,9 +119,7 @@ export function BvnAndNinForm() {
                 onBlur={field.onBlur}
                 disabled={identify.isPending}
                 error={errors.dateOfBirth?.message ?? (isMismatch ? MISMATCH_TEXT : undefined)}
-                errorAction={
-                  isMismatch && !errors.dateOfBirth ? <GetHelpButton variant="inline" /> : undefined
-                }
+                errorAction={isMismatch && !errors.dateOfBirth ? <GetHelpButton /> : undefined}
               />
             )}
           />
