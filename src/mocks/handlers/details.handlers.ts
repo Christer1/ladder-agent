@@ -1,4 +1,4 @@
-// MSW handlers for the details endpoints. Details only after liveness (rules.md §10).
+// MSW handlers for the details endpoints. Details only after liveness.
 // The sample person matches the Your Details design.
 import { delay, http } from 'msw';
 import type {
@@ -12,8 +12,12 @@ import { fail, ok, requireSession, url } from './http';
 const SAMPLE_DETAILS: AssistanceDetails = {
   fullName: 'Victor Awojobi',
   dateOfBirth: '2000-04-12',
+  gender: 'Male',
   phoneNumber: '08123456789',
   email: 'victor@example.com',
+  stateOfOrigin: 'Ogun',
+  stateOfResidence: 'Lagos',
+  town: 'Lekki',
   residentialAddress: '14 Admiralty Way, Lekki Phase 1, Lagos',
 };
 

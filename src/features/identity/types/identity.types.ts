@@ -7,5 +7,5 @@ export type IdentifyNinRequest = { nin: string; dateOfBirth: string };
 export type IdentifyBvnAndNinRequest = { bvn: string; nin: string; dateOfBirth: string };
 export type IdentifyLadderIdRequest = { ladderId: string };
 
-/** Status only: no personal data before liveness (rules.md §10). */
+/** Status only: no personal data before liveness. */
 export type IdentifyResponse = { status: StepStatus };

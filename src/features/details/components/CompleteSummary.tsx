@@ -10,7 +10,7 @@ export function CompleteSummary() {
   const endSession = useEndSession();
 
   // A full page load (not router.replace) also drops pages that cacheComponents keeps mounted,
-  // so no retrieved details stay in memory (rules.md §10).
+  // so no retrieved details stay in memory.
   const finish = () =>
     endSession.mutate(undefined, { onSettled: () => window.location.replace(ROUTES.WELCOME) });
 

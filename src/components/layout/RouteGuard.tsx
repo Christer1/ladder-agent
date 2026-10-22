@@ -1,4 +1,4 @@
-// Keeps users on their next step of the assistance session (rules.md §7).
+// Keeps users on their next step of the assistance session.
 //
 // No session: GET /assistance/status answers 401 and lib/api/client redirects to /.
 // Session but step not reached yet: replace() to the first incomplete step.

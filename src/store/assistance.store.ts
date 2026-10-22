@@ -1,5 +1,5 @@
 // Zustand store: flow flags only. Never BVN, NIN, date of birth, Ladder ID or details.
-// Not persisted (rules.md §10): a hard refresh falls back to the server status.
+// Not persisted: a hard refresh falls back to the server status.
 import { create } from 'zustand';
 
 type AssistanceState = {

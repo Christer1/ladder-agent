@@ -1,4 +1,4 @@
-// Responsive page frame. All breakpoint-specific framing lives here (rules.md §5):
+// Responsive page frame. All breakpoint-specific framing lives here:
 //   < md      full-screen, pixel-matched to the mobile designs
 //   md – lg   full-width page, content in a centred column (max 480px)
 //   ≥ lg      partner BrandPanel on the left, content column on the right

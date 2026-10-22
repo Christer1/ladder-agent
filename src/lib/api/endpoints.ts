@@ -1,5 +1,5 @@
 // Every backend URL, grouped by feature. No URL strings anywhere else.
-// These paths are a proposal (rules.md §7): confirm with ladder-backend.
+// These paths are a proposal (README → API contract): confirm with ladder-backend.
 export const ENDPOINTS = {
   identify: {
     bvn: '/assistance/identify/bvn',

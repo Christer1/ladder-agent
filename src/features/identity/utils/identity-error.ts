@@ -1,4 +1,4 @@
-// Maps an identify error to where it is shown and whether Get Help sits beside it (rules.md §7).
+// Maps an identify error to where it is shown and whether Get Help sits beside it.
 import type { ApiError } from '@/lib/api/errors';
 
 export const MISMATCH_MESSAGE = 'Information mismatch.';

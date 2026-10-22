@@ -1,4 +1,4 @@
-// The partner this deployment serves. Components read branding from here, never hard-code it (rules.md §6).
+// The partner this deployment serves. Components read branding from here, never hard-code it.
 import { env } from './env';
 
 export const PARTNER = {

@@ -1,4 +1,4 @@
-/* Tailwind layers + design tokens taken from ladder-assisntance-screens (rules.md §6). */
+/* Tailwind layers + design tokens taken from ladder-assisntance-screens. */
 @import 'tailwindcss';
 
 /*
@@ -58,7 +58,7 @@
     @apply bg-surface font-sans text-text-strong antialiased;
   }
 
-  /* Visible focus ring on all interactive elements (rules.md §11). */
+  /* Visible focus ring on all interactive elements. */
   :where(a, button, input, select, textarea, [tabindex]):focus-visible {
     @apply outline-2 outline-offset-2 outline-primary-600;
   }

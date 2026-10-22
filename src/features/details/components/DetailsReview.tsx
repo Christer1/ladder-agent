@@ -114,7 +114,7 @@ function DetailsForm({ details }: { details: AssistanceDetails }) {
         )}
       </div>
 
-      {/* Pinned to the bottom on mobile (rules.md §5). */}
+      {/* Pinned to the bottom on mobile. */}
       <div className="mt-auto pt-10 md:mt-10 md:pt-0">
         <Button
           type="submit"
