@@ -13,7 +13,7 @@ const SAMPLE_DETAILS: AssistanceDetails = {
   fullName: 'Victor Awojobi',
   dateOfBirth: '2000-04-12',
   phoneNumber: '08123456789',
-  email: 'victor@gmail.com',
+  email: 'victor@example.com',
   residentialAddress: '14 Admiralty Way, Lekki Phase 1, Lagos',
 };
 

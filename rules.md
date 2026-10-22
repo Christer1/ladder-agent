@@ -6,7 +6,7 @@ Read before writing code in `ladder-assistance`. When this file is silent, follo
 
 A responsive web app a partner (first: **Zenith**) uses to open customer accounts. The customer identifies with **BVN or NIN**, **BVN and NIN**, or their **Ladder ID** (looked up in the same `ladder-backend` database as Ladder Web), passes a **liveness check**, and reviews the details we retrieved.
 
-- The designs in `../ladder-assisntance-screens` are the **mobile** breakpoint. Tablet/desktop follow §5.
+- The designs (kept outside this repo, in `ladder-assistance-screens`) are the **mobile** breakpoint. Tablet/desktop follow §5.
 - Backend: `../ladder-backend`. The endpoints below don't exist yet, so build against MSW mocks (§9).
 
 ## 2. Screens and flow
