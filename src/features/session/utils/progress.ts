@@ -25,7 +25,7 @@ export function getNextRoute(status: AssistanceStatus, isConfirmed: boolean): Ro
   return isConfirmed ? ROUTES.COMPLETE : ROUTES.DETAILS;
 }
 
-/** Whether `pathname` may be shown now (rules.md §7). */
+/** Whether `pathname` may be shown now. */
 export function isRouteAllowed(
   pathname: string,
   status: AssistanceStatus,

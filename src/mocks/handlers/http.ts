@@ -1,4 +1,4 @@
-// Envelope helpers shared by the MSW handlers (same shapes as rules.md §7). Copied from ladder-web.
+// Envelope helpers shared by the MSW handlers (same shapes as ladder-backend). Copied from ladder-web.
 import { HttpResponse } from 'msw';
 import { env } from '@/config/env';
 import type { ApiErrorBody, ApiSuccess } from '@/types/api.types';

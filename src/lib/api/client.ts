@@ -11,7 +11,7 @@ const IDENTIFY_PATHS: readonly string[] = Object.values(ENDPOINTS.identify);
 
 export const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
-  // The assistance session is an httpOnly cookie set on identify (rules.md §7).
+  // The assistance session is an httpOnly cookie set on identify.
   withCredentials: true,
   timeout: 30_000,
   headers: { Accept: 'application/json', 'X-Partner-Id': env.partnerId },
@@ -29,7 +29,7 @@ apiClient.interceptors.response.use(
     const apiError = normalizeError(error);
     const requestPath = axios.isAxiosError(error) ? error.config?.url : undefined;
 
-    // Expired session: start over. A full page load also drops the query cache (rules.md §10).
+    // Expired session: start over. A full page load also drops the query cache.
     if (apiError.status === 401 && requestPath && !IDENTIFY_PATHS.includes(requestPath)) {
       useAssistanceStore.getState().reset();
       if (typeof window !== 'undefined') window.location.assign(ROUTES.WELCOME);

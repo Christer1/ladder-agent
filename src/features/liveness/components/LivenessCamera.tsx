@@ -174,7 +174,7 @@ export function LivenessCamera() {
         )}
       </div>
 
-      {/* Pinned to the bottom on mobile (rules.md §5); Cancel replaces it while the camera runs. */}
+      {/* Pinned to the bottom on mobile; Cancel replaces it while the camera runs. */}
       <div className="mt-auto pt-6 md:mt-8">
         {showStartButton && (
           <Button onClick={() => void handleStart()}>

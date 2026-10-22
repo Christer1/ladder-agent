@@ -1,5 +1,5 @@
 // getUserMedia lifecycle for the liveness camera (start, stop, capture frame). Copied from ladder-web.
-// The stream is always stopped on unmount (rules.md §10).
+// The stream is always stopped on unmount.
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type CameraStatus = 'idle' | 'requesting' | 'active' | 'error';

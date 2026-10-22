@@ -1,4 +1,4 @@
-// MSW handlers for the details endpoints. Details only after liveness (rules.md §10).
+// MSW handlers for the details endpoints. Details only after liveness.
 // The sample person matches the Your Details design.
 import { delay, http } from 'msw';
 import type {

@@ -10,11 +10,9 @@ The customer can identify in one of three ways:
 
 After that, they pass a **liveness check** and review the details that were retrieved.
 
-> Read [`rules.md`](rules.md) before writing code. It covers scope, screens, the API contract, security and the definition of done.
-
 ## Status
 
-The screens are built, but **the app runs on mock data (MSW)**. The `/assistance/*` endpoints it calls do not exist in [`ladder-backend`](../ladder-backend) yet. The planned contract is in `rules.md` §7. Until the backend serves those endpoints, keep `NEXT_PUBLIC_USE_MOCKS=true`.
+The screens are built, but **the app runs on mock data (MSW)**. The `/assistance/*` endpoints it calls do not exist in [`ladder-backend`](../ladder-backend) yet. The planned contract is under [API contract](#api-contract). Until the backend serves those endpoints, keep `NEXT_PUBLIC_USE_MOCKS=true`.
 
 ## User flow
 
@@ -78,7 +76,7 @@ The partner logo and skyline are in `public/brand/`. On desktop the brand panel 
 
 ### Mock test values
 
-With mocks on, these inputs trigger each result (`rules.md` §9). Any date of birth that makes the customer 18 or older is accepted.
+With mocks on, these inputs trigger each result (see `src/mocks/handlers/`). Any date of birth that makes the customer 18 or older is accepted.
 
 | Input                                     | Result                                                                                              |
 | ----------------------------------------- | --------------------------------------------------------------------------------------------------- |
@@ -149,11 +147,31 @@ Data always flows through the same chain:
 page.tsx → feature component → useXxx hook → xxx.api.ts → lib/api/client.ts → backend
 ```
 
+## API contract
+
+The `/assistance/*` endpoints are a proposal until `ladder-backend` serves them. Paths live in `src/lib/api/endpoints.ts`.
+
+Call chain: `page → component → hook → <feature>.api.ts → lib/api/client.ts`. Components never use axios. Hooks never build URLs. Navigation happens in components.
+
+| Method | Path                               | Body                        | Returns                                                                                                                                                         |
+| ------ | ---------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/assistance/identify/bvn`         | `{ bvn, dateOfBirth }`      | `{ status }` + session cookie                                                                                                                                   |
+| POST   | `/assistance/identify/nin`         | `{ nin, dateOfBirth }`      | same                                                                                                                                                            |
+| POST   | `/assistance/identify/bvn-and-nin` | `{ bvn, nin, dateOfBirth }` | same (both must be the same person)                                                                                                                             |
+| POST   | `/assistance/identify/ladder-id`   | `{ ladderId }`              | same                                                                                                                                                            |
+| POST   | `/assistance/liveness`             | multipart `selfie`          | `{ status }`                                                                                                                                                    |
+| GET    | `/assistance/status`               | —                           | `{ method, identity, liveness }`                                                                                                                                |
+| GET    | `/assistance/details`              | —                           | `{ fullName, dateOfBirth, gender, phoneNumber, email, stateOfOrigin, stateOfResidence, town, residentialAddress }` (all but name and date of birth may be null) |
+| POST   | `/assistance/confirm`              | `{ residentialAddress? }`   | `{}`                                                                                                                                                            |
+| POST   | `/assistance/session/end`          | —                           | clears cookie                                                                                                                                                   |
+
+- Same envelope as the backend: `{ success, message, data }` / `{ success: false, message, code, errors? }`.
+- Error codes: `INFORMATION_MISMATCH` (any wrong/unknown number or date of birth, or a BVN and NIN of different people: the backend never says which), `LADDER_ID_NOT_FOUND`, `LIVENESS_REQUIRED` (403), `ASSISTANCE_SESSION_EXPIRED` (401 → `/`), `PARTNER_NOT_ALLOWED` (403), `RATE_LIMITED`, `VALIDATION_FAILED`. `FACE_MISMATCH` exists only in mocks until a liveness provider is added.
+- Session: a short-lived httpOnly cookie set on identify. Every request sends `X-Partner-Id`. `RouteGuard` uses `/assistance/status` to keep users on their next step.
+
 ## Security and privacy
 
 - No personal data is returned before liveness passes. The identify endpoints return a status only.
 - A Ladder ID that doesn't exist and one that isn't verified return the same error, so IDs can't be probed.
 - BVN, NIN, date of birth, Ladder ID, selfies and retrieved details are never logged or kept on the device: no localStorage, URLs or query keys. The query cache is cleared when the session ends and on a 401.
 - The camera stops on capture, cancel, error and leaving the page.
-
-See `rules.md` §10.

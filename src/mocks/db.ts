@@ -1,9 +1,9 @@
 // In-memory "backend" state shared by the MSW handlers.
 // Mirrored to sessionStorage so a page reload keeps your progress while developing.
-// Only flags and statuses: never BVN, NIN, date of birth, Ladder ID or selfies (rules.md §10).
+// Only flags and statuses: never BVN, NIN, date of birth, Ladder ID or selfies.
 import type { AssistanceStatus, IdentityMethod } from '@/features/session';
 
-/** Test behaviour picked at identify time from the test values (rules.md §9). */
+/** Test behaviour picked at identify time from the test values. */
 export type MockScenario = 'default' | 'face-mismatch' | 'no-address';
 
 type MockDb = {

@@ -79,7 +79,7 @@ export const identityHandlers = [
       await delay(LOOKUP_DELAY_MS);
       const ladderId = (await request.json()).ladderId.trim().toUpperCase();
       if (ladderId === 'LID-2222-2222' || ladderId === 'LID-3333-3333') {
-        // One message for "not found" and "not verified" so IDs can't be probed (rules.md §10).
+        // One message for "not found" and "not verified" so IDs can't be probed.
         const message = 'We couldn’t verify this Ladder ID. Check it and try again.';
         return fail(422, { message, code: 'LADDER_ID_NOT_FOUND' });
       }
