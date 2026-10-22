@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { isMockingEnabled } from '@/mocks/start';
 import { normalizeError } from '@/lib/api/errors';
+import { startHelpChat } from '../api/help-chat.api';
 import type { HelpChatConnection, HelpChatMessage } from '../types/help-chat.types';
 
 export type HelpChatStatus = 'connecting' | 'ready' | 'error';
@@ -28,16 +29,31 @@ function connect(reference: string | null): Promise<HelpChatConnection> {
   if (current?.reference === reference) return current.connection;
   void current?.connection.then((old) => old.close()).catch(() => undefined);
 
-  const load = isMockingEnabled
-    ? import('@/mocks/help-chat')
-    : import('../api/help-chat.connection');
-  const connection = load.then(({ openHelpChat }) => openHelpChat(reference));
+  const connection = isMockingEnabled
+    ? import('@/mocks/help-chat').then(({ openHelpChat }) => openHelpChat(reference))
+    : openLiveChat(reference);
   current = { reference, connection };
   // A failed open is retried from scratch next time.
   connection.catch(() => {
     if (current?.connection === connection) current = null;
   });
   return connection;
+}
+
+// The backend request and the Firebase SDK download run side by side, not one after the other.
+function openLiveChat(reference: string | null): Promise<HelpChatConnection> {
+  const started = startHelpChat(reference ? { reference } : {});
+  // openHelpChat reports this failure; this only stops an unhandled rejection if the import fails.
+  started.catch(() => undefined);
+  return import('../api/help-chat.connection').then(({ openHelpChat }) => openHelpChat(started));
+}
+
+/** Downloads and sets up Firebase while Get Help is on screen, so tapping it opens faster. */
+export function preloadHelpChat(): void {
+  if (isMockingEnabled) return;
+  import('../api/help-chat.connection')
+    .then(({ prepareHelpChat }) => prepareHelpChat())
+    .catch(() => undefined);
 }
 
 export function useHelpChat(reference: string | null) {

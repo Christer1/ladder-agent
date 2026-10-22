@@ -3,8 +3,10 @@
 // Rendered as a full-width card so it reads as a separate action, not part of the error text.
 'use client';
 
+import { useEffect } from 'react';
 import { env } from '@/config/env';
 import { PARTNER } from '@/config/partner';
+import { preloadHelpChat } from '@/features/help-chat';
 import { cn } from '@/lib/utils/cn';
 import { useHelpChatStore } from '@/store/help-chat.store';
 
@@ -80,6 +82,10 @@ function CardText({ subtitle }: { subtitle: string }) {
 
 export function GetHelpButton({ reference = null, className }: GetHelpButtonProps) {
   const openChat = useHelpChatStore((state) => state.open);
+
+  useEffect(() => {
+    if (env.helpChannel === 'web') preloadHelpChat();
+  }, []);
 
   if (env.helpChannel === 'whatsapp') {
     return (

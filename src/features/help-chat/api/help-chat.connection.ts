@@ -1,5 +1,6 @@
 // Opens a help chat: the backend creates it, the browser signs in to Firebase with the token it
 // returns and reads helpChats/{chatId} live. Loaded with import() (it pulls in the Firebase SDK).
+// The caller starts the backend request so it runs while this module downloads.
 import { signInWithCustomToken, signOut } from 'firebase/auth';
 import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { getFirebase } from '@/lib/firebase/client';
@@ -8,14 +9,22 @@ import type {
   HelpChatMessage,
   HelpChatSender,
   HelpChatSnapshot,
+  StartHelpChatResponse,
 } from '../types/help-chat.types';
-import { sendHelpChatMessage, startHelpChat } from './help-chat.api';
+import { sendHelpChatMessage } from './help-chat.api';
 
 const COLLECTION = 'helpChats';
 
-export async function openHelpChat(reference: string | null): Promise<HelpChatConnection> {
-  const { chatId, firebaseToken } = await startHelpChat(reference ? { reference } : {});
+/** Sets Firebase up ahead of time, so opening the chat only waits on the network. */
+export function prepareHelpChat(): void {
+  getFirebase();
+}
+
+export async function openHelpChat(
+  started: Promise<StartHelpChatResponse>,
+): Promise<HelpChatConnection> {
   const { auth, db } = getFirebase();
+  const { chatId, firebaseToken } = await started;
   await signInWithCustomToken(auth, firebaseToken);
   const chatRef = doc(db, COLLECTION, chatId);
 
