@@ -1,0 +1,64 @@
+/* Tailwind layers + design tokens taken from ladder-assisntance-screens (rules.md §6). */
+@import 'tailwindcss';
+
+/*
+ * Partner colours (primary-*) are the only tokens that change per partner.
+ * Text colours were checked against WCAG AA on white.
+ */
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Partner (Zenith) */
+  --color-primary-700: #b3261e; /* primary hover */
+  --color-primary-600: #d32f2f; /* primary button, active segment, spinner, ID illustration */
+  --color-primary-200: #f5c2c4; /* ID illustration lines */
+  --color-primary-100: #fbe3e4; /* disabled button, ID illustration tile */
+  --color-primary-50: #fdf4f4; /* desktop brand panel */
+
+  /* Ladder (Ladder ID button, "Powered by Ladder") */
+  --color-ladder-900: #1e3c47;
+  --color-ladder-500: #4ea38d;
+  --color-ladder-300: #9bebd3;
+  --color-ladder-100: #c9f5e8;
+
+  /* Surfaces */
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f2f4f7; /* segmented control track, icon circles */
+  --color-surface-success: #ecf7ee; /* "We found your details" banner */
+  --color-face-placeholder: #d9d9d9; /* liveness oval before the camera starts */
+
+  /* Text */
+  --color-text-strong: #101828; /* headings, values, card titles */
+  --color-text-heading: #1f3a4a; /* Ladder ID, liveness and details headings */
+  --color-text-body: #344054;
+  --color-text-muted: #667085; /* subtitles, labels, placeholders (4.8:1) */
+  --color-danger: #d92d20; /* "Information mismatch.", error borders (4.6:1) */
+  --color-success: #2e7d32;
+  --color-whatsapp: #25d366;
+
+  /* Lines */
+  --color-border: #e4e7ec;
+  --color-skyline: #d0d5dd;
+
+  /* Radii */
+  --radius-input: 8px;
+  --radius-segment: 12px;
+  --radius-card: 12px; /* option cards, detail cards */
+  --radius-tile: 24px; /* ID illustration tile */
+  --radius-pill: 9999px; /* buttons */
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-surface font-sans text-text-strong antialiased;
+  }
+
+  /* Visible focus ring on all interactive elements (rules.md §11). */
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary-600;
+  }
+}

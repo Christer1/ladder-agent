@@ -99,7 +99,7 @@ Call chain: `page → component → hook → <feature>.api.ts → lib/api/client
 
 - Zod schema + React Hook Form. Submit buttons are disabled until the form is valid.
 - BVN/NIN: 11 digits. Date of birth: native date input, 18+, sent as `YYYY-MM-DD`. Ladder ID: `LID-XXXX-XXXX`, upper-cased.
-- Server data lives in TanStack Query. Flow state (chosen method, confirmed flag) lives in Zustand, not persisted. Form input stays in the form.
+- Server data lives in TanStack Query. Flow state (the "confirmed" flag) lives in Zustand, not persisted. The chosen method comes from `/assistance/status`. Form input stays in the form.
 
 ## 9. Mocks
 
