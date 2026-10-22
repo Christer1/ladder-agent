@@ -2,7 +2,9 @@
 // Everything else is plain text, so nothing a message contains can become HTML.
 import { Fragment } from 'react';
 
-const BOLD = /\*([^*\n]+)\*/g;
+// The asterisks must not touch letters, digits, # or another *, so USSD codes such as *565*0#
+// and *346# are shown exactly as typed.
+const BOLD = /(?<![\p{L}\d*])\*([^*\n]+)\*(?![\p{L}\d#*])/gu;
 
 export function formatMessage(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
