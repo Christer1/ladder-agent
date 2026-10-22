@@ -12,13 +12,9 @@ import { fail, ok, requireSession, url } from './http';
 const SAMPLE_DETAILS: AssistanceDetails = {
   fullName: 'Victor Awojobi',
   dateOfBirth: '2000-04-12',
-  gender: 'Male',
-  phoneNumber: '09012345678',
+  phoneNumber: '08123456789',
   email: 'victor@example.com',
-  stateOfOrigin: 'Oyo',
-  stateOfResidence: 'Oyo',
-  town: 'Ibadan',
-  residentialAddress: 'No 13, Sunmade Kajola, Olode',
+  residentialAddress: '14 Admiralty Way, Lekki Phase 1, Lagos',
 };
 
 const requireLiveness = () =>
