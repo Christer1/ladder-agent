@@ -36,6 +36,8 @@ export function BvnOrNinForm() {
   // The number and date of birth didn't match a record. Both fields are marked: we can't say which.
   const [isMismatch, setIsMismatch] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  // Opens the help chat about this failure.
+  const [helpReference, setHelpReference] = useState<string | null>(null);
   const isPending = identifyBvn.isPending || identifyNin.isPending;
 
   const {
@@ -73,6 +75,7 @@ export function BvnOrNinForm() {
 
   const handleError = (error: ApiError) => {
     const resolved = resolveIdentityError(error);
+    setHelpReference(resolved.helpReference);
     if (resolved.isMismatch) {
       setIsMismatch(true);
     } else if (resolved.field === 'dateOfBirth') {
@@ -147,7 +150,11 @@ export function BvnOrNinForm() {
                   errors.dateOfBirth?.message ??
                   (isMismatch ? mismatchMessage(`${idLabel} and date of birth`) : undefined)
                 }
-                errorAction={isMismatch && !errors.dateOfBirth ? <GetHelpButton /> : undefined}
+                errorAction={
+                  isMismatch && !errors.dateOfBirth ? (
+                    <GetHelpButton reference={helpReference} />
+                  ) : undefined
+                }
               />
             )}
           />

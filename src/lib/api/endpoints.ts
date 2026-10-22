@@ -16,4 +16,8 @@ export const ENDPOINTS = {
     me: '/assistance/details',
     confirm: '/assistance/confirm',
   },
+  helpChat: {
+    start: '/assistance/help-chat',
+    messages: (chatId: string) => `/assistance/help-chat/${encodeURIComponent(chatId)}/messages`,
+  },
 } as const;

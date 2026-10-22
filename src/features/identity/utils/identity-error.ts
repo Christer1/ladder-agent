@@ -19,16 +19,33 @@ export type ResolvedIdentityError = {
   message: string;
   /** The user may not fix this by retyping, so offer Get Help beside the message. */
   showsHelp: boolean;
+  /** The backend's help reference (LDR-XXXXXX) for this failure, so Get Help can open its chat. */
+  helpReference: string | null;
 };
 
 const KNOWN_FIELDS: readonly string[] = ['bvn', 'nin', 'dateOfBirth', 'ladderId'];
 
 export function resolveIdentityError(error: ApiError): ResolvedIdentityError {
+  const { helpReference } = error.details;
+  const help = typeof helpReference === 'string' ? helpReference : null;
+
   switch (error.code) {
     case 'INFORMATION_MISMATCH':
-      return { isMismatch: true, field: null, message: MISMATCH_MESSAGE, showsHelp: true };
+      return {
+        isMismatch: true,
+        field: null,
+        message: MISMATCH_MESSAGE,
+        showsHelp: true,
+        helpReference: help,
+      };
     case 'LADDER_ID_NOT_FOUND':
-      return { isMismatch: false, field: 'ladderId', message: error.message, showsHelp: true };
+      return {
+        isMismatch: false,
+        field: 'ladderId',
+        message: error.message,
+        showsHelp: true,
+        helpReference: help,
+      };
   }
 
   const [fieldName, messages] = Object.entries(error.fieldErrors)[0] ?? [];
@@ -38,7 +55,14 @@ export function resolveIdentityError(error: ApiError): ResolvedIdentityError {
       field: fieldName as IdentityErrorField,
       message: messages?.[0] ?? error.message,
       showsHelp: false,
+      helpReference: null,
     };
   }
-  return { isMismatch: false, field: null, message: error.message, showsHelp: false };
+  return {
+    isMismatch: false,
+    field: null,
+    message: error.message,
+    showsHelp: false,
+    helpReference: null,
+  };
 }

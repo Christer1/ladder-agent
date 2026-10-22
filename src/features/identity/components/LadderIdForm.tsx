@@ -23,6 +23,8 @@ export function LadderIdForm() {
   const identify = useIdentifyLadderId();
   const [formError, setFormError] = useState<string | null>(null);
   const [isHelpVisible, setIsHelpVisible] = useState(false);
+  // Opens the help chat about this failure.
+  const [helpReference, setHelpReference] = useState<string | null>(null);
 
   const {
     register,
@@ -45,6 +47,7 @@ export function LadderIdForm() {
         onError: (error) => {
           const resolved = resolveIdentityError(error);
           setIsHelpVisible(resolved.showsHelp);
+          setHelpReference(resolved.helpReference);
           if (resolved.field === 'ladderId') {
             setError('ladderId', { type: 'server', message: resolved.message });
           } else {
@@ -83,7 +86,9 @@ export function LadderIdForm() {
           readOnly={identify.isPending}
           error={errors.ladderId?.message}
           errorAction={
-            isHelpVisible && errors.ladderId?.type === 'server' ? <GetHelpButton /> : undefined
+            isHelpVisible && errors.ladderId?.type === 'server' ? (
+              <GetHelpButton reference={helpReference} />
+            ) : undefined
           }
           {...register('ladderId', {
             // A server answer is about the ID as typed, so any edit clears it.

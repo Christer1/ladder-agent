@@ -26,10 +26,14 @@ import { fail, ok, url } from './http';
 
 const LOOKUP_DELAY_MS = 1800;
 
+// Like ladder-backend, a failed identify comes with the help reference that Get Help opens a chat about.
+const helpDetails = () => ({ helpReference: 'LDR-7K3QX9' });
+
 const mismatch = () =>
   fail(422, {
     message: 'Information mismatch. The details you entered don’t match our records.',
     code: 'INFORMATION_MISMATCH',
+    details: helpDetails(),
   });
 
 function succeed(method: IdentityMethod, scenario: MockScenario = 'default') {
@@ -81,7 +85,7 @@ export const identityHandlers = [
       if (ladderId === 'LID-2222-2222' || ladderId === 'LID-3333-3333') {
         // One message for "not found" and "not verified" so IDs can't be probed.
         const message = 'We couldn’t verify this Ladder ID. Check it and try again.';
-        return fail(422, { message, code: 'LADDER_ID_NOT_FOUND' });
+        return fail(422, { message, code: 'LADDER_ID_NOT_FOUND', details: helpDetails() });
       }
       if (ladderId === 'LID-4444-4444') return succeed('ladder-id', 'face-mismatch');
       if (ladderId === 'LID-5555-5555') return succeed('ladder-id', 'no-address');

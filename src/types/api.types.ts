@@ -13,6 +13,8 @@ export type ApiErrorBody = {
   code: string;
   /** Field-level validation errors. */
   errors?: Record<string, string[]>;
+  /** Extra data beside the error, e.g. { helpReference } on a failed identify. */
+  details?: Record<string, unknown>;
 };
 
 export type ApiResponse<T> = ApiSuccess<T> | ApiErrorBody;

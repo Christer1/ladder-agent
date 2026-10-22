@@ -29,7 +29,7 @@ A responsive web app a partner (first: **Zenith**) uses to open customer account
 ```
 
 - **`/`**: partner logo, "Open a new account with {partner}", two option cards (BVN or NIN, BVN and NIN), "OR", then "Create account using Ladder ID". Skyline and tagline at the bottom.
-- **`/bvn-or-nin`**: BVN | NIN toggle (BVN default), 11-digit number, date of birth. Continue is disabled until the form is valid. On `INFORMATION_MISMATCH`, mark both fields red and show "Information mismatch. Check your BVN and date of birth." under date of birth with an inline **Get help** (WhatsApp) link beside it, not pinned to the bottom. Any edit clears it.
+- **`/bvn-or-nin`**: BVN | NIN toggle (BVN default), 11-digit number, date of birth. Continue is disabled until the form is valid. On `INFORMATION_MISMATCH`, mark both fields red and show "Information mismatch. Check your BVN and date of birth." under date of birth with an inline **Get help** card beside it (opens the help chat, see §7), not pinned to the bottom. Any edit clears it.
 - **`/bvn-and-nin`**: same layout with BVN and NIN fields and no toggle; a mismatch marks all three fields.
 - **`/ladder-id`**: ID illustration, Ladder ID field, Verify. Success → `/liveness`. `LADDER_ID_NOT_FOUND` shows under the field with Get help beside it.
 - **`/liveness`**: same behaviour as Ladder Web (`LivenessCamera` + `useCamera`), with the red CTA. Success → `/verifying`.
@@ -92,8 +92,11 @@ Call chain: `page → component → hook → <feature>.api.ts → lib/api/client
 | GET | `/assistance/details` | — | `{ fullName, dateOfBirth, gender, phoneNumber, email, stateOfOrigin, stateOfResidence, town, residentialAddress }` (all but name and date of birth may be null) |
 | POST | `/assistance/confirm` | `{ residentialAddress? }` | `{}` |
 | POST | `/assistance/session/end` | — | clears cookie |
+| POST | `/assistance/help-chat` | `{ reference? }` | `{ chatId, firebaseToken }` |
+| POST | `/assistance/help-chat/:chatId/messages` | `{ text }` + `Authorization: Bearer <Firebase ID token>` | `202` |
 
-- Same envelope as the backend: `{ success, message, data }` / `{ success: false, message, code, errors? }`.
+- Same envelope as the backend: `{ success, message, data }` / `{ success: false, message, code, errors?, details? }`. A failed identify's `details.helpReference` (`LDR-XXXXXX`) is passed to its Get help card.
+- **Help chat** (`features/help-chat`, `NEXT_PUBLIC_HELP_CHANNEL=web`). Get help opens the widget (`store/help-chat.store.ts`; mounted once in `Providers`); it never opens on its own. The backend opens the chat with the preset customer message and Ladder's language question, and the AI answers every message. The browser signs in to Firebase with `firebaseToken` (in-memory persistence only) and reads `helpChats/{chatId}` live; it never writes to Firestore. The Firebase SDK is loaded with `import()` only when the chat opens. `NEXT_PUBLIC_HELP_CHANNEL=whatsapp` switches Get help back to the WhatsApp link. Help chat 401s (`HELP_CHAT_SESSION_INVALID`) are shown in the chat and don't end the session.
 - Error codes: `INFORMATION_MISMATCH` (any wrong/unknown number or date of birth, or a BVN and NIN of different people: the backend never says which), `LADDER_ID_NOT_FOUND`, `LIVENESS_REQUIRED` (403), `ASSISTANCE_SESSION_EXPIRED` (401 → `/`), `PARTNER_NOT_ALLOWED` (403), `RATE_LIMITED`, `VALIDATION_FAILED`. `FACE_MISMATCH` exists only in mocks until a liveness provider is added.
 - Session: a short-lived httpOnly cookie set on identify. Every request sends `X-Partner-Id`. `RouteGuard` uses `/assistance/status` to keep users on their next step.
 
@@ -117,6 +120,8 @@ With `NEXT_PUBLIC_USE_MOCKS=false`, the real backend answers: use the numbers an
 | `LID-2222-2222` | `LADDER_ID_NOT_FOUND` |
 | `LID-5555-5555` | no address returned |
 | anything else valid | success |
+
+Mock failures return the help reference `LDR-7K3QX9`. The help chat runs in memory (`mocks/help-chat.ts`; MSW can't fake Firestore) with a fixed reply.
 
 ## 10. Security (non-negotiable)
 

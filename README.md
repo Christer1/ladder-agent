@@ -23,7 +23,7 @@ The screens are built, but **the app runs on mock data (MSW)**. The `/assistance
 | Route          | What happens                                                                                                                                                                                           |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `/`            | Partner branding and the three ways to identify                                                                                                                                                        |
-| `/bvn-or-nin`  | BVN or NIN toggle, 11-digit number and date of birth. A mismatch marks every field and shows "Information mismatch." with a Get Help (WhatsApp) link                                                   |
+| `/bvn-or-nin`  | BVN or NIN toggle, 11-digit number and date of birth. A mismatch marks every field and shows "Information mismatch." with a Get Help card that opens the help chat                                     |
 | `/bvn-and-nin` | BVN, NIN and date of birth                                                                                                                                                                             |
 | `/ladder-id`   | Ladder ID such as `LID-XXXX-XXXX`. Validation is loose (6–32 letters, numbers and dashes, any case) so a format change doesn't break the screen                                                        |
 | `/liveness`    | Camera check. It starts only after the customer presses Verify Face                                                                                                                                    |
@@ -63,14 +63,16 @@ Open http://localhost:3001. Ladder Web uses port 3000, so both can run at the sa
 
 All of these are public (`NEXT_PUBLIC_`). Never put a secret here.
 
-| Variable                           | Default                         | Description                                                                         |
-| ---------------------------------- | ------------------------------- | ----------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_API_BASE_URL`         | `http://localhost:4000/api/v1`  | Base URL of `ladder-backend`. Required for production builds                        |
-| `NEXT_PUBLIC_USE_MOCKS`            | `false`                         | `true` serves the API from the MSW mocks in `src/mocks` (development only)          |
-| `NEXT_PUBLIC_PARTNER_ID`           | `zenith`                        | Sent as the `X-Partner-Id` header                                                   |
-| `NEXT_PUBLIC_PARTNER_NAME`         | `Zenith`                        | Shown in the UI                                                                     |
-| `NEXT_PUBLIC_PARTNER_TAGLINE`      | `Banking for a brighter future` | Shown over the skyline at the bottom of the mobile welcome screen                   |
-| `NEXT_PUBLIC_SUPPORT_WHATSAPP_URL` | placeholder `wa.me` link        | Target of the Get Help button. Set the partner's real support number per deployment |
+| Variable                           | Default                         | Description                                                                                                                  |
+| ---------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_API_BASE_URL`         | `http://localhost:4000/api/v1`  | Base URL of `ladder-backend`. Required for production builds                                                                 |
+| `NEXT_PUBLIC_USE_MOCKS`            | `false`                         | `true` serves the API from the MSW mocks in `src/mocks` (development only)                                                   |
+| `NEXT_PUBLIC_PARTNER_ID`           | `zenith`                        | Sent as the `X-Partner-Id` header                                                                                            |
+| `NEXT_PUBLIC_PARTNER_NAME`         | `Zenith`                        | Shown in the UI                                                                                                              |
+| `NEXT_PUBLIC_PARTNER_TAGLINE`      | `Banking for a brighter future` | Shown over the skyline at the bottom of the mobile welcome screen                                                            |
+| `NEXT_PUBLIC_SUPPORT_WHATSAPP_URL` | placeholder `wa.me` link        | Target of the Get Help button when `NEXT_PUBLIC_HELP_CHANNEL=whatsapp`. Set the partner's real support number per deployment |
+| `NEXT_PUBLIC_HELP_CHANNEL`         | `web`                           | `web` opens the help chat widget; `whatsapp` opens the WhatsApp link above                                                   |
+| `NEXT_PUBLIC_FIREBASE_*`           | —                               | `API_KEY`, `AUTH_DOMAIN`, `PROJECT_ID`, `APP_ID` of the Firebase web app (help chat)                                         |
 
 The partner logo and skyline are in `public/brand/`. On desktop the brand panel draws the skyline faded across its lower half, behind the subtext; the SVG uses `preserveAspectRatio="none"` and non-scaling strokes so it can stretch to fit.
 
@@ -153,17 +155,19 @@ The `/assistance/*` endpoints are a proposal until `ladder-backend` serves them.
 
 Call chain: `page → component → hook → <feature>.api.ts → lib/api/client.ts`. Components never use axios. Hooks never build URLs. Navigation happens in components.
 
-| Method | Path                               | Body                        | Returns                                                                                                                                                         |
-| ------ | ---------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| POST   | `/assistance/identify/bvn`         | `{ bvn, dateOfBirth }`      | `{ status }` + session cookie                                                                                                                                   |
-| POST   | `/assistance/identify/nin`         | `{ nin, dateOfBirth }`      | same                                                                                                                                                            |
-| POST   | `/assistance/identify/bvn-and-nin` | `{ bvn, nin, dateOfBirth }` | same (both must be the same person)                                                                                                                             |
-| POST   | `/assistance/identify/ladder-id`   | `{ ladderId }`              | same                                                                                                                                                            |
-| POST   | `/assistance/liveness`             | multipart `selfie`          | `{ status }`                                                                                                                                                    |
-| GET    | `/assistance/status`               | —                           | `{ method, identity, liveness }`                                                                                                                                |
-| GET    | `/assistance/details`              | —                           | `{ fullName, dateOfBirth, gender, phoneNumber, email, stateOfOrigin, stateOfResidence, town, residentialAddress }` (all but name and date of birth may be null) |
-| POST   | `/assistance/confirm`              | `{ residentialAddress? }`   | `{}`                                                                                                                                                            |
-| POST   | `/assistance/session/end`          | —                           | clears cookie                                                                                                                                                   |
+| Method | Path                                     | Body                                                     | Returns                                                                                                                                                         |
+| ------ | ---------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/assistance/identify/bvn`               | `{ bvn, dateOfBirth }`                                   | `{ status }` + session cookie                                                                                                                                   |
+| POST   | `/assistance/identify/nin`               | `{ nin, dateOfBirth }`                                   | same                                                                                                                                                            |
+| POST   | `/assistance/identify/bvn-and-nin`       | `{ bvn, nin, dateOfBirth }`                              | same (both must be the same person)                                                                                                                             |
+| POST   | `/assistance/identify/ladder-id`         | `{ ladderId }`                                           | same                                                                                                                                                            |
+| POST   | `/assistance/liveness`                   | multipart `selfie`                                       | `{ status }`                                                                                                                                                    |
+| GET    | `/assistance/status`                     | —                                                        | `{ method, identity, liveness }`                                                                                                                                |
+| GET    | `/assistance/details`                    | —                                                        | `{ fullName, dateOfBirth, gender, phoneNumber, email, stateOfOrigin, stateOfResidence, town, residentialAddress }` (all but name and date of birth may be null) |
+| POST   | `/assistance/confirm`                    | `{ residentialAddress? }`                                | `{}`                                                                                                                                                            |
+| POST   | `/assistance/session/end`                | —                                                        | clears cookie                                                                                                                                                   |
+| POST   | `/assistance/help-chat`                  | `{ reference? }`                                         | `{ chatId, firebaseToken }`. Opens (or reopens) the help chat with the preset message and Ladder's language question                                            |
+| POST   | `/assistance/help-chat/:chatId/messages` | `{ text }` + `Authorization: Bearer <Firebase ID token>` | `202`. Ladder's reply arrives in Firestore                                                                                                                      |
 
 - Same envelope as the backend: `{ success, message, data }` / `{ success: false, message, code, errors? }`.
 - Error codes: `INFORMATION_MISMATCH` (any wrong/unknown number or date of birth, or a BVN and NIN of different people: the backend never says which), `LADDER_ID_NOT_FOUND`, `LIVENESS_REQUIRED` (403), `ASSISTANCE_SESSION_EXPIRED` (401 → `/`), `PARTNER_NOT_ALLOWED` (403), `RATE_LIMITED`, `VALIDATION_FAILED`. `FACE_MISMATCH` exists only in mocks until a liveness provider is added.

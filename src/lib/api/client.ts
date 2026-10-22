@@ -8,6 +8,8 @@ import { ENDPOINTS } from './endpoints';
 import { normalizeError } from './errors';
 
 const IDENTIFY_PATHS: readonly string[] = Object.values(ENDPOINTS.identify);
+// The help chat has its own 401 (an expired chat token), shown in the chat, not a session expiry.
+const isHelpChatPath = (path: string) => path.startsWith(ENDPOINTS.helpChat.start);
 
 export const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
@@ -30,7 +32,12 @@ apiClient.interceptors.response.use(
     const requestPath = axios.isAxiosError(error) ? error.config?.url : undefined;
 
     // Expired session: start over. A full page load also drops the query cache.
-    if (apiError.status === 401 && requestPath && !IDENTIFY_PATHS.includes(requestPath)) {
+    if (
+      apiError.status === 401 &&
+      requestPath &&
+      !IDENTIFY_PATHS.includes(requestPath) &&
+      !isHelpChatPath(requestPath)
+    ) {
       useAssistanceStore.getState().reset();
       if (typeof window !== 'undefined') window.location.assign(ROUTES.WELCOME);
     }

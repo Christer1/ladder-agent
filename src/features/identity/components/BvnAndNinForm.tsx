@@ -31,6 +31,8 @@ export function BvnAndNinForm() {
   // Every field is marked: we can't say which one is wrong.
   const [isMismatch, setIsMismatch] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  // Opens the help chat about this failure.
+  const [helpReference, setHelpReference] = useState<string | null>(null);
 
   const {
     control,
@@ -55,6 +57,7 @@ export function BvnAndNinForm() {
 
   const handleError = (error: ApiError) => {
     const resolved = resolveIdentityError(error);
+    setHelpReference(resolved.helpReference);
     if (resolved.isMismatch) {
       setIsMismatch(true);
     } else if (resolved.field && resolved.field !== 'ladderId') {
@@ -119,7 +122,11 @@ export function BvnAndNinForm() {
                 onBlur={field.onBlur}
                 disabled={identify.isPending}
                 error={errors.dateOfBirth?.message ?? (isMismatch ? MISMATCH_TEXT : undefined)}
-                errorAction={isMismatch && !errors.dateOfBirth ? <GetHelpButton /> : undefined}
+                errorAction={
+                  isMismatch && !errors.dateOfBirth ? (
+                    <GetHelpButton reference={helpReference} />
+                  ) : undefined
+                }
               />
             )}
           />

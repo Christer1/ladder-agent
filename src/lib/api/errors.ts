@@ -11,23 +11,27 @@ export class ApiError extends Error {
   readonly code: string;
   readonly status: number | null;
   readonly fieldErrors: Record<string, string[]>;
+  readonly details: Record<string, unknown>;
 
   constructor({
     message,
     code,
     status,
     fieldErrors = {},
+    details = {},
   }: {
     message: string;
     code: string;
     status: number | null;
     fieldErrors?: Record<string, string[]>;
+    details?: Record<string, unknown>;
   }) {
     super(message);
     this.name = 'ApiError';
     this.code = code;
     this.status = status;
     this.fieldErrors = fieldErrors;
+    this.details = details;
   }
 }
 
@@ -56,6 +60,7 @@ export function normalizeError(error: unknown): ApiError {
         code: data.code,
         status,
         fieldErrors: data.errors,
+        details: data.details,
       });
     }
     return new ApiError({ message: GENERIC_ERROR_MESSAGE, code: 'UNKNOWN', status });

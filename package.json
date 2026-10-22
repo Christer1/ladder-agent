@@ -16,6 +16,7 @@
     "@tanstack/react-query": "^5",
     "axios": "^1",
     "clsx": "^2",
+    "firebase": "^12.19.0",
     "next": "16.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -41,5 +42,8 @@
     "workerDirectory": [
       "public"
     ]
+  },
+  "overrides": {
+    "@grpc/grpc-js": "1.13.7"
   }
 }
